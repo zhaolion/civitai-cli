@@ -20,7 +20,8 @@ func NewTerminal() *Terminal {
 	return &Terminal{Output: NewTerminalTable()}
 }
 
-func (terminal *Terminal) PrintModelInfo(ctx context.Context, m *ModelInfo, opt *FormatModelInfoOption) error {
+// PrintModelInfo print model info into terminal.
+func (terminal *Terminal) PrintModelInfo(ctx context.Context, m *ModelInfo, _ *FormatModelInfoOption) error {
 	table := NewConsoleTable()
 
 	cells := make([]*ConsoleCell, 0)
@@ -40,10 +41,22 @@ func (terminal *Terminal) PrintModelInfo(ctx context.Context, m *ModelInfo, opt 
 		Key:  "Creator",
 		Text: fmt.Sprintf("%s", m.Creator.Username),
 	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "Stat",
+		Text: fmt.Sprintf("download:%d\nthumbsUp:%d", m.Stats.DownloadCount, m.Stats.ThumbsUpCount),
+	})
+	// Versions
 	versionTexts := make([]string, 0)
 	for _, ver := range m.ModelVersions {
-		versionTexts = append(versionTexts, fmt.Sprintf("[%d][%s] %s", ver.ID, ver.Name, ver.DownloadURL))
+		// Too many ...
+		if len(versionTexts) >= 3 {
+			versionTexts = append(versionTexts, "...")
+			break
+		} else {
+			versionTexts = append(versionTexts, fmt.Sprintf("[%d][%s] %s", ver.ID, ver.Name, ver.DownloadURL))
+		}
 	}
+
 	cells = append(cells, &ConsoleCell{
 		Key:  "Versions",
 		Text: strings.Join(versionTexts, "\n"),

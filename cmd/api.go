@@ -5,7 +5,12 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 	"github.com/zhaolion/civitai-cli/civitai/api"
+)
+
+var (
+	flagDebug = flag.Bool("debug", false, "enable debug mode")
 )
 
 var apiRootCmd = &cobra.Command{
@@ -14,6 +19,8 @@ var apiRootCmd = &cobra.Command{
 }
 
 func APICommand() *cobra.Command {
+	flag.Parse()
+
 	apiRootCmd.AddCommand(apiTokenSetCmd())
 	apiRootCmd.AddCommand(apiTokenShowCmd())
 	apiRootCmd.AddCommand(apiModelInfoCmd())
@@ -52,8 +59,11 @@ func apiModelInfoCmd() *cobra.Command {
 				fmt.Println("Please provide a model identifier")
 			}
 			ctx := context.Background()
+			client := api.NewClient(api.GetAPIToken(),
+				api.CivitaiClientOptionDebug(*flagDebug),
+			)
 
-			model, err := api.NewClient(api.GetAPIToken()).ModelInfoByID(args[0])
+			model, err := client.ModelInfoByID(args[0])
 			if err != nil {
 				panic(err)
 			}
@@ -61,5 +71,6 @@ func apiModelInfoCmd() *cobra.Command {
 			_ = api.NewTerminal().PrintModelInfo(ctx, model, nil)
 		},
 	}
+
 	return cmd
 }

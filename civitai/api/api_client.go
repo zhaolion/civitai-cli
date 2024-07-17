@@ -80,4 +80,12 @@ func NewClient(token string, opts ...CivitaiClientOption) *CivitaiClient {
 *  CivitaiClientOption
 *****************************************/
 
-type CivitaiClientOption func(*CivitaiClient)
+type CivitaiClientOption func(cli *CivitaiClient)
+
+func CivitaiClientOptionDebug(enable bool) CivitaiClientOption {
+	return func(cli *CivitaiClient) {
+		if enable {
+			cli.Client.EnableDebugLog().EnableTraceAll().EnableDumpAllWithoutBody()
+		}
+	}
+}
