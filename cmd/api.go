@@ -23,7 +23,8 @@ func APICommand() *cobra.Command {
 
 	apiRootCmd.AddCommand(apiTokenSetCmd())
 	apiRootCmd.AddCommand(apiTokenShowCmd())
-	apiRootCmd.AddCommand(apiModelInfoCmd())
+	apiRootCmd.AddCommand(apiModelInfoShowCmd())
+	apiRootCmd.AddCommand(apiModelVersionShowCmd())
 	return apiRootCmd
 }
 
@@ -51,7 +52,7 @@ func apiTokenShowCmd() *cobra.Command {
 	return cmd
 }
 
-func apiModelInfoCmd() *cobra.Command {
+func apiModelInfoShowCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "model",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -69,6 +70,30 @@ func apiModelInfoCmd() *cobra.Command {
 			}
 
 			_ = api.NewTerminal().PrintModelInfo(ctx, model, nil)
+		},
+	}
+
+	return cmd
+}
+
+func apiModelVersionShowCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "model_ver",
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 {
+				fmt.Println("Please provide a model version identifier")
+			}
+			ctx := context.Background()
+			client := api.NewClient(api.GetAPIToken(),
+				api.CivitaiClientOptionDebug(*flagDebug),
+			)
+
+			ver, err := client.ModelVersionByID(args[0])
+			if err != nil {
+				panic(err)
+			}
+
+			_ = api.NewTerminal().PrintModelVersionByID(ctx, ver, nil)
 		},
 	}
 

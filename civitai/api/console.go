@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/alexeyco/simpletable"
+	"github.com/dustin/go-humanize"
 )
 
 /****************************************
@@ -74,6 +75,81 @@ func (terminal *Terminal) PrintModelInfo(ctx context.Context, m *ModelInfo, _ *F
 }
 
 type FormatModelInfoOption struct {
+	Full bool
+}
+
+func (terminal *Terminal) PrintModelVersionByID(ctx context.Context, m *ModelVersion, _ *FormatModelVersionOption) error {
+	table := NewConsoleTable()
+
+	cells := make([]*ConsoleCell, 0)
+	cells = append(cells, &ConsoleCell{
+		Key:  "ID",
+		Text: fmt.Sprintf("%d", m.ID),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "Name",
+		Text: fmt.Sprintf("%s", m.Name),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "ModelID",
+		Text: fmt.Sprintf("%d", m.ModelID),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "ModelType",
+		Text: fmt.Sprintf("%s", m.Model.Type),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "ModelName",
+		Text: fmt.Sprintf("%s", m.Model.Name),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "BaseModel",
+		Text: fmt.Sprintf("%s", m.BaseModel),
+	})
+	cells = append(cells, &ConsoleCell{
+		Key:  "Stat",
+		Text: fmt.Sprintf("download:%d thumbsUp:%d", m.Stats.DownloadCount, m.Stats.ThumbsUpCount),
+	})
+
+	var primaryFile *ModelVersionFiles
+	for _, file := range m.Files {
+		if file.Primary {
+			primaryFile = &file
+			break
+		}
+	}
+	if primaryFile != nil {
+		cells = append(cells, &ConsoleCell{
+			Key:  "Size",
+			Text: humanize.Bytes(uint64(primaryFile.SizeKB) * 1024),
+		})
+		cells = append(cells, &ConsoleCell{
+			Key:  "FileURL",
+			Text: primaryFile.DownloadURL,
+		})
+	} else {
+		cells = append(cells, &ConsoleCell{
+			Key:  "Size",
+			Text: "0B",
+		})
+		cells = append(cells, &ConsoleCell{
+			Key:  "FileURL",
+			Text: "None",
+		})
+	}
+
+	table.Cells = append(table.Cells, cells)
+
+	// print into terminal
+	output, err := terminal.Output.Format(ctx, table)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(output))
+	return nil
+}
+
+type FormatModelVersionOption struct {
 	Full bool
 }
 
