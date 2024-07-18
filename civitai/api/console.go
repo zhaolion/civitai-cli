@@ -44,7 +44,7 @@ func (terminal *Terminal) PrintModelInfo(ctx context.Context, m *ModelInfo, _ *F
 	})
 	cells = append(cells, &ConsoleCell{
 		Key:  "Stat",
-		Text: fmt.Sprintf("download:%d\nthumbsUp:%d", m.Stats.DownloadCount, m.Stats.ThumbsUpCount),
+		Text: fmt.Sprintf("download:%d thumbsUp:%d", m.Stats.DownloadCount, m.Stats.ThumbsUpCount),
 	})
 	// Versions
 	versionTexts := make([]string, 0)

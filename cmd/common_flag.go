@@ -1,9 +1,10 @@
 package cmd
 
-import (
-	flag "github.com/spf13/pflag"
+var (
+	argDebug bool
 )
 
 var (
-	flagDebug = flag.Bool("debug", false, "enable debug mode")
+	argModelID int64
+	argVerID   int64
 )

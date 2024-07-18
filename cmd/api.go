@@ -3,17 +3,21 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zhaolion/civitai-cli/civitai/api"
 )
 
 var apiRootCmd = &cobra.Command{
-	Use: "api",
-	Run: func(cmd *cobra.Command, args []string) {},
+	Use:   "api",
+	Short: "Interact with CivitAI.",
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 func APICommand() *cobra.Command {
+	apiRootCmd.PersistentFlags().BoolVarP(&argDebug, "debug", "", false, "enable debug mode")
+
 	apiRootCmd.AddCommand(apiTokenSetCmd())
 	apiRootCmd.AddCommand(apiTokenShowCmd())
 	apiRootCmd.AddCommand(apiModelInfoShowCmd())
@@ -23,13 +27,18 @@ func APICommand() *cobra.Command {
 
 func apiTokenSetCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "set_api_token",
+		Use:   "set_api_token",
+		Short: "set api token for authentication.",
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				fmt.Println("Please provide a token")
+				fmt.Println("Please provide a token.")
+			}
+			token := strings.TrimSpace(args[0])
+			if token == "" {
+				fmt.Println("Please provide a none empty token.")
 			}
 
-			api.SetAPIToken(args[0])
+			api.SetAPIToken(token)
 		},
 	}
 	return cmd
@@ -37,7 +46,8 @@ func apiTokenSetCmd() *cobra.Command {
 
 func apiTokenShowCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "show_api_token",
+		Use:   "view_api_token",
+		Short: "view which api token is currently set.",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println(api.GetAPITokenMask())
 		},
@@ -47,17 +57,16 @@ func apiTokenShowCmd() *cobra.Command {
 
 func apiModelInfoShowCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "model",
+		Use:   "model",
+		Short: "view model info by model id",
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				fmt.Println("Please provide a model identifier")
-			}
 			ctx := context.Background()
 			client := api.NewClient(api.GetAPIToken(),
-				api.CivitaiClientOptionDebug(*flagDebug),
+				api.CivitaiClientOptionDebug(argDebug),
 			)
 
-			model, err := client.ModelInfoByID(args[0])
+			modelID := fmt.Sprintf("%d", argModelID)
+			model, err := client.ModelInfoByID(modelID)
 			if err != nil {
 				panic(err)
 			}
@@ -65,23 +74,24 @@ func apiModelInfoShowCmd() *cobra.Command {
 			_ = api.NewTerminal().PrintModelInfo(ctx, model, nil)
 		},
 	}
+	cmd.PersistentFlags().Int64VarP(&argModelID, "mid", "", 0, "model id")
+	_ = cmd.MarkFlagRequired("mid")
 
 	return cmd
 }
 
 func apiModelVersionShowCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "model_ver",
+		Use:   "model_ver",
+		Short: "view model's version info by version id.",
 		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) == 0 {
-				fmt.Println("Please provide a model version identifier")
-			}
 			ctx := context.Background()
 			client := api.NewClient(api.GetAPIToken(),
-				api.CivitaiClientOptionDebug(*flagDebug),
+				api.CivitaiClientOptionDebug(argDebug),
 			)
 
-			ver, err := client.ModelVersionByID(args[0])
+			vID := fmt.Sprintf("%d", argVerID)
+			ver, err := client.ModelVersionByID(vID)
 			if err != nil {
 				panic(err)
 			}
@@ -89,6 +99,8 @@ func apiModelVersionShowCmd() *cobra.Command {
 			_ = api.NewTerminal().PrintModelVersionByID(ctx, ver, nil)
 		},
 	}
+	cmd.PersistentFlags().Int64VarP(&argVerID, "vid", "", 0, "model version id")
+	_ = cmd.MarkFlagRequired("vid")
 
 	return cmd
 }
