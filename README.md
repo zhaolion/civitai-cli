@@ -147,3 +147,27 @@ will return the version info in terminal:
 |----|------|---------|------------|---------------------|-----------|----------------------------|--------|-------------------------------------------|
 | 1  | V1   | 1       | Checkpoint | Superhero Diffusion | SD 1.5    | download:2684 thumbsUp:444 | 2.1 GB | https://civitai.com/api/download/models/1 |
 ```
+
+
+## Contributing
+
+Thanks for the interest in the project!
+
+Please create an issue if you encounter any problem, bugs or if you have a feature request.
+
+To debug things, it is recommended to run with `--debug` option.
+* Running in debug allows users to print tracebacks and other messages useful for debugging.
+* Example: `civitai-cli api model --mid 1 --debug`
+
+To work on an issue:
+* Please create a fork.
+* Then clone your fork locally.
+* Then create a local branch that describes the issue.
+* Once you have commited your changes, push the branch to your forked repository.
+* Then open a pull request to this repository.
+
+<br/>
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](./License) file for details
