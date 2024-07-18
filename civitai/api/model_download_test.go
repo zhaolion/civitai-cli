@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,6 +10,6 @@ import (
 func TestCivitaiClient_downloadWithProgressBar(t *testing.T) {
 	client := initTestClient()
 
-	err := client.ModelDownloadByID("352581", "647401", "./aaa.ckpt")
+	err := client.ModelVerDownloadByID(context.Background(), "352581", "647401", "./aaa.ckpt")
 	assert.NoError(t, err)
 }

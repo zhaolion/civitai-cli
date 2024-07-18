@@ -5,12 +5,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	flag "github.com/spf13/pflag"
 	"github.com/zhaolion/civitai-cli/civitai/api"
-)
-
-var (
-	flagDebug = flag.Bool("debug", false, "enable debug mode")
 )
 
 var apiRootCmd = &cobra.Command{
@@ -19,13 +14,10 @@ var apiRootCmd = &cobra.Command{
 }
 
 func APICommand() *cobra.Command {
-	flag.Parse()
-
 	apiRootCmd.AddCommand(apiTokenSetCmd())
 	apiRootCmd.AddCommand(apiTokenShowCmd())
 	apiRootCmd.AddCommand(apiModelInfoShowCmd())
 	apiRootCmd.AddCommand(apiModelVersionShowCmd())
-	apiRootCmd.AddCommand(apiModelDownloadCmd())
 	return apiRootCmd
 }
 
@@ -95,28 +87,6 @@ func apiModelVersionShowCmd() *cobra.Command {
 			}
 
 			_ = api.NewTerminal().PrintModelVersionByID(ctx, ver, nil)
-		},
-	}
-
-	return cmd
-}
-
-func apiModelDownloadCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use: "download_model",
-		Run: func(cmd *cobra.Command, args []string) {
-			if len(args) != 2 {
-				fmt.Println("Please provide a model identifier")
-			}
-			//ctx := context.Background()
-			client := api.NewClient(api.GetAPIToken(),
-				api.CivitaiClientOptionDebug(*flagDebug),
-			)
-
-			err := client.ModelDownloadByID(args[0], args[1], "")
-			if err != nil {
-				panic(err)
-			}
 		},
 	}
 
