@@ -8,11 +8,6 @@ import (
 	"github.com/imroc/req/v3"
 )
 
-const (
-	CivitaiAPIBaseV1 = "https://civitai.com/api/"
-	UserAgent        = "civitai-go-client (https://github.com/zhaolion/civitai-cli)"
-)
-
 var (
 	abortRetryStatusCodes = []int{http.StatusNotFound, http.StatusUnauthorized}
 )

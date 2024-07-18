@@ -10,8 +10,7 @@ import (
 
 func initTestClient() *CivitaiClient {
 	token := os.Getenv("CIVITAI_API_KEY")
-	client := NewClient(token)
-	client.DevMode()
+	client := NewClient(token, CivitaiClientOptionDebug(false))
 	return client
 }
 

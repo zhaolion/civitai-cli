@@ -4,13 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
-)
-
-const (
-	URLModelInfoByID        = "/v1/models/%s"
-	URLModelVersionInfoByID = "/v1/model-versions/%s"
-	URLModelVersionByID     = "/download/models/%s"
 )
 
 /****************************************
@@ -18,11 +13,11 @@ const (
 *****************************************/
 
 type ModelStats struct {
-	DownloadCount   int `json:"downloadCount,omitempty"` // version 公共字段 - begin
-	RatingCount     int `json:"ratingCount,omitempty"`
-	Rating          int `json:"rating,omitempty"`
-	ThumbsUpCount   int `json:"thumbsUpCount,omitempty"`
-	ThumbsDownCount int `json:"thumbsDownCount,omitempty"` // version 公共字段 - end
+	DownloadCount   int     `json:"downloadCount,omitempty"` // version 公共字段 - begin
+	RatingCount     int     `json:"ratingCount,omitempty"`
+	Rating          float64 `json:"rating,omitempty"`
+	ThumbsUpCount   int     `json:"thumbsUpCount,omitempty"`
+	ThumbsDownCount int     `json:"thumbsDownCount,omitempty"` // version 公共字段 - end
 
 	FavoriteCount     int `json:"favoriteCount,omitempty"`
 	CommentCount      int `json:"commentCount,omitempty"`
@@ -96,6 +91,17 @@ type ModelInfo struct {
 func (m *ModelInfo) JSON() string {
 	bs, _ := json.MarshalIndent(m, "", "\t")
 	return string(bs)
+}
+
+func (m *ModelInfo) MatchVerByID(verID string) *ModelInfoVersions {
+	targetID, _ := strconv.Atoi(verID)
+	for _, ver := range m.ModelVersions {
+		if ver.ID == targetID {
+			return &ver
+		}
+	}
+
+	return nil
 }
 
 type ModelCreator struct {
