@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zhaolion/civitai-cli/civitai/api"
+	"github.com/zhaolion/civitai-cli/civitai/download"
 )
 
 var (
@@ -31,12 +32,14 @@ func apiModelDownloadCmd() *cobra.Command {
 		Short: "download files in model from CivitAI",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			client := api.NewClient(api.GetAPIToken(),
-				api.CivitaiClientOptionDebug(argDebug),
+			client := download.NewClient(
+				api.NewClient(api.GetAPIToken(), api.CivitaiClientOptionDebug(argDebug)),
 			)
 
 			modelID := fmt.Sprintf("%d", argModelID)
-			err := client.ModelDownloadByID(ctx, modelID, argTargetDir)
+			err := client.ModelDownloadByID(ctx, modelID, argTargetDir, &download.ModelDownloadOption{
+				VersionNameList: argVerNames,
+			})
 			if err != nil {
 				panic(err)
 			}
@@ -44,6 +47,7 @@ func apiModelDownloadCmd() *cobra.Command {
 	}
 	cmd.PersistentFlags().Int64VarP(&argModelID, "mid", "", 0, "model id")
 	cmd.PersistentFlags().StringVarP(&argTargetDir, "dir", "", ".", "target dir, default is current dir")
+	cmd.PersistentFlags().StringArrayVarP(&argVerNames, "filter_ver_names", "", []string{}, "filter files by version name")
 	_ = cmd.MarkFlagRequired("mid")
 	return cmd
 }
@@ -54,13 +58,14 @@ func apiModelVerDownloadCmd() *cobra.Command {
 		Short: "download files in one model's version from CivitAI",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			client := api.NewClient(api.GetAPIToken(),
-				api.CivitaiClientOptionDebug(argDebug),
+			client := download.NewClient(
+				api.NewClient(api.GetAPIToken(), api.CivitaiClientOptionDebug(argDebug)),
 			)
 
 			modelID := fmt.Sprintf("%d", argModelID)
-			verID := fmt.Sprintf("%d", argVerID)
-			err := client.ModelVerDownloadByID(ctx, modelID, verID, argTargetDir)
+			err := client.ModelDownloadByID(ctx, modelID, argTargetDir, &download.ModelDownloadOption{
+				VersionIDList: []int64{argVerID},
+			})
 			if err != nil {
 				panic(err)
 			}
